@@ -3,22 +3,29 @@ import "../styles/App.css";
 import { useSelector, useDispatch } from "react-redux";
 import { actions } from "./store";
 
-const API_KEY = "f9f5ceb2c9424c72a1d87f5d441e917b";   //Get your own api key from newsapi
+const API_KEY = "068e2971b1d74bfc96fa703c112fc5be"; //Get your own api key from newsapi
 
 const App = () => {
   const dispatch = useDispatch();
-  const newsObj = useSelector();
+  const newsObj = useSelector((state) => state.hotNews);
   useEffect(() => {
-    
+    fetch(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${API_KEY}`)
+      .then((json) => json.json())
+      .then((obj) => {
+        dispatch(actions.set({ articles: obj.articles, num: 5 }));
+      });
   }, []);
 
   const numChangeHandler = (e) => {
+    dispatch(actions.setNum({ num: e.target.value }));
   };
 
-  let articles = [];
+  let articles = [...newsObj.articles];
 
   const filteredArticles = articles
-    
+    .sort(() => Math.random() - 0.5)
+    .slice(0, newsObj.articlesNum);
+  console.log(filteredArticles);
 
   return (
     <div id="main">
@@ -28,8 +35,8 @@ const App = () => {
         <input
           type="number"
           id="num"
-          onChange={}
-          min={}
+          onChange={numChangeHandler}
+          min={1}
         ></input>
       </div>
       {newsObj.articlesNum !== 0 ? (
